@@ -1,0 +1,21 @@
+# Fichiers sensibles
+.env
+db.sqlite3
+
+# Django
+__pycache__/
+*.pyc
+media/
+staticfiles/
+
+# Environnements Python
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+
+# Fichiers système
+Thumbs.db
+.DS_Store
