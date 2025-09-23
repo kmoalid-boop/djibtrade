@@ -71,3 +71,4 @@ class ChangePasswordSerializer(serializers.Serializer):
         """
         validate_password(value)
         return value
+

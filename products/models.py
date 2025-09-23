@@ -27,6 +27,12 @@ class Product(models.Model):
         ('USD', 'Dollar Américain'),
     ]
 
+    CONTACT_METHOD_CHOICES = [
+        ('whatsapp', 'WhatsApp'),
+        ('phone', 'Téléphone'),
+        ('both', 'WhatsApp et Téléphone'),
+    ]
+
     # --- Relations ---
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -46,7 +52,7 @@ class Product(models.Model):
         default='DJF',
         help_text="Devise du prix"
     )
-    quantity = models.PositiveIntegerField(default=1, help_text="Quantité disponible")
+    stock = models.PositiveIntegerField(default=1, help_text="Quantité disponible")
     total_price = models.DecimalField(
         max_digits=12,
         decimal_places=2,
@@ -65,7 +71,21 @@ class Product(models.Model):
     city = models.CharField(max_length=100, blank=True, null=True, help_text="Ville de disponibilité")
 
     # --- Médias ---
-    image = models.ImageField(upload_to='products/', blank=True, null=True, help_text="Image du produit")
+    image = models.ImageField(
+        upload_to='products/', 
+        default='products/default_product.jpg',
+        help_text="Image du produit"
+    )
+
+    # --- Contact ---
+    contact_method = models.CharField(
+        max_length=20, 
+        choices=CONTACT_METHOD_CHOICES, 
+        default='whatsapp',
+        help_text="Méthode de contact préférée"
+    )
+    whatsapp_contact = models.CharField(max_length=20, blank=True, null=True, help_text="Numéro WhatsApp")
+    phone_contact = models.CharField(max_length=20, blank=True, null=True, help_text="Numéro de téléphone")
 
     # --- Liens externes ---
     whatsapp_link = models.URLField(max_length=255, blank=True, null=True, help_text="Lien direct WhatsApp")
@@ -80,8 +100,8 @@ class Product(models.Model):
         - Génère automatiquement le lien WhatsApp si l'utilisateur a un numéro de téléphone.
         """
         # Calcul automatique du prix total
-        if self.unit_price and self.quantity:
-            self.total_price = self.unit_price * self.quantity
+        if self.unit_price and self.stock:
+            self.total_price = self.unit_price * self.stock
 
         # Génération automatique du lien WhatsApp
         if self.owner and hasattr(self.owner, 'phone') and self.owner.phone:

@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import ProductViewSet, CategoryViewSet
+from .views import ProductViewSet, CategoryViewSet, user_products
 
 # ================================
 # Configuration du routeur DRF
@@ -27,6 +27,9 @@ router.register(
 # URLs de l'application "products"
 # ================================
 urlpatterns = [
+    # Route personnalisée pour récupérer les annonces de l'utilisateur connecté
+    path('user-products/', user_products, name='user-products'),
+    
     # On inclut toutes les routes générées par le routeur
     path('', include(router.urls)),
 ]

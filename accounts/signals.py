@@ -1,6 +1,7 @@
 import logging
 from django.conf import settings
-from django.core.mail import send_mail
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django_rest_passwordreset.signals import reset_password_token_created
@@ -9,23 +10,61 @@ from .models import User
 # Configuration du logger
 logger = logging.getLogger(__name__)
 
-# 🔹 Signal : Token de réinitialisation de mot de passe
+# 🔹 Signal : Token de réinitialisation de mot de passe (VERSION PROFESSIONNELLE)
 @receiver(reset_password_token_created)
 def password_reset_token_created(sender, instance, reset_password_token, *args, **kwargs):
     """
-    Envoie un email contenant le token de réinitialisation de mot de passe.
+    Envoie un email HTML professionnel avec un lien cliquable pour la réinitialisation.
     """
-    email_plaintext_message = f"Voici votre token de réinitialisation : {reset_password_token.key}"
-
     try:
-        send_mail(
-            subject="Réinitialisation de mot de passe",
-            message=email_plaintext_message,
+        # Construire l'URL complète avec le token
+        reset_url = f"http://localhost:5173/reset-password?token={reset_password_token.key}"
+        
+        # Context pour le template
+        context = {
+            'reset_url': reset_url,
+            'user': reset_password_token.user,
+            'token': reset_password_token.key  # Garder le token au cas où
+        }
+        
+        # Rendre le template HTML
+        html_content = render_to_string('email/password_reset.html', context)
+        
+        # Version texte pour les clients email qui ne supportent pas HTML
+        text_content = f"""
+        Réinitialisation de mot de passe DjibTrade
+        
+        Bonjour,
+        
+        Vous avez demandé la réinitialisation de votre mot de passe DjibTrade.
+        
+        Pour réinitialiser votre mot de passe, cliquez sur le lien suivant :
+        {reset_url}
+        
+        Si le lien ne fonctionne pas, copiez-collez cette URL dans votre navigateur.
+        
+        Si vous n'avez pas demandé cette réinitialisation, veuillez ignorer cet email.
+        
+        Ce lien expirera dans 24 heures pour des raisons de sécurité.
+        
+        Cordialement,
+        L'équipe DjibTrade
+        """
+        
+        # Créer l'email avec les deux versions (texte et HTML)
+        msg = EmailMultiAlternatives(
+            subject="Réinitialisation de votre mot de passe DjibTrade",
+            body=text_content,
             from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[reset_password_token.user.email],
-            fail_silently=False
+            to=[reset_password_token.user.email]
         )
-        logger.info(f"📩 Email de réinitialisation envoyé à {reset_password_token.user.email}")
+        msg.attach_alternative(html_content, "text/html")
+        
+        # Envoyer l'email
+        msg.send()
+        
+        logger.info(f"📩 Email de réinitialisation avec lien cliquable envoyé à {reset_password_token.user.email}")
+        
     except Exception as e:
         logger.error(f"❌ Erreur lors de l'envoi de l'email de reset : {e}")
 
@@ -33,24 +72,48 @@ def password_reset_token_created(sender, instance, reset_password_token, *args, 
 @receiver(post_save, sender=User)
 def send_welcome_email(sender, instance, created, **kwargs):
     """
-    Envoie un email de bienvenue lorsqu'un nouvel utilisateur est créé.
+    Envoie un email de bienvenue HTML lorsqu'un nouvel utilisateur est créé.
     """
     if created:
         logger.info(f"🎉 Nouvel utilisateur créé : {instance.email} ({instance.role})")
 
         try:
-            send_mail(
+            # Context pour le template de bienvenue
+            context = {
+                'user': instance,
+                'company_name': instance.company_name,
+                'login_url': 'http://localhost:5173/login'
+            }
+            
+            # Rendre le template HTML
+            html_content = render_to_string('email/welcome.html', context)
+            
+            # Version texte
+            text_content = f"""
+            Bonjour {instance.company_name},
+
+            Bienvenue sur Djibtrade ! Nous sommes ravis de vous compter parmi nous.
+            
+            Vous pouvez maintenant vous connecter et publier vos annonces :
+            http://localhost:5173/login
+            
+            À très bientôt,
+            L'équipe Djibtrade
+            """
+            
+            # Créer l'email
+            msg = EmailMultiAlternatives(
                 subject="Bienvenue sur Djibtrade 🎉",
-                message=(
-                    f"Bonjour {instance.company_name},\n\n"
-                    "Bienvenue sur Djibtrade ! Nous sommes ravis de vous compter parmi nous.\n"
-                    "Vous pouvez maintenant vous connecter et publier vos annonces.\n\n"
-                    "À très bientôt,\nL'équipe Djibtrade"
-                ),
+                body=text_content,
                 from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[instance.email],
-                fail_silently=True
+                to=[instance.email]
             )
-            logger.info(f"📩 Email de bienvenue envoyé à {instance.email}")
+            msg.attach_alternative(html_content, "text/html")
+            
+            # Envoyer l'email
+            msg.send()
+            
+            logger.info(f"📩 Email de bienvenue HTML envoyé à {instance.email}")
+            
         except Exception as e:
             logger.error(f"❌ Erreur lors de l'envoi de l'email de bienvenue : {e}")

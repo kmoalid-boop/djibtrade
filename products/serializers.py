@@ -27,12 +27,15 @@ class ProductSerializer(serializers.ModelSerializer):
             'description',
             'unit_price',
             'currency',
-            'quantity',
+            'stock',
             'total_price',
             'category',
             'category_name',
             'city',
             'image',
+            'contact_method',
+            'whatsapp_contact',
+            'phone_contact',
             'whatsapp_link',
             'views',
             'created_at',
@@ -54,6 +57,14 @@ class ProductSerializer(serializers.ModelSerializer):
         if value not in valid_currencies:
             raise serializers.ValidationError("La devise doit être DJF ou USD.")
         return value
+
+    def validate(self, data):
+        """
+        Validation personnalisée pour s'assurer qu'une image est fournie.
+        """
+        if not data.get('image') and not self.instance:
+            raise serializers.ValidationError({"image": "L'image est obligatoire."})
+        return data
 
     def create(self, validated_data):
         """

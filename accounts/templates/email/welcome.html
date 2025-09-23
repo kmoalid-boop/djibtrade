@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Bienvenue sur DjibTrade</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background-color: #4F46E5; color: white; padding: 20px; text-align: center; border-radius: 10px 10px 0 0; }
+        .content { background-color: #f9f9f9; padding: 20px; border-radius: 0 0 10px 10px; border: 1px solid #ddd; }
+        .button { display: inline-block; background-color: #4F46E5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; margin: 15px 0; }
+        .footer { margin-top: 20px; font-size: 12px; color: #666; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>DjibTrade</h1>
+    </div>
+    <div class="content">
+        <h2>Bienvenue sur DjibTrade 🎉</h2>
+        <p>Bonjour <strong>{{ company_name }}</strong>,</p>
+        <p>Nous sommes ravis de vous accueillir sur DjibTrade, la plateforme de référence pour le commerce à Djibouti.</p>
+        
+        <p>Avec votre compte, vous pouvez :</p>
+        <ul>
+            <li>📦 Publier des annonces de produits</li>
+            <li>🛒 Parcourir les offres des autres commerçants</li>
+            <li>💼 Gérer votre entreprise en ligne</li>
+            <li>📈 Développer votre réseau professionnel</li>
+        </ul>
+        
+        <div style="text-align: center;">
+            <a href="{{ login_url }}" class="button">
+                Commencer à utiliser DjibTrade
+            </a>
+        </div>
+        
+        <p>Si vous avez des questions, n'hésitez pas à répondre à cet email ou à consulter notre centre d'aide.</p>
+    </div>
+    <div class="footer">
+        <p>© 2024 DjibTrade. Tous droits réservés.</p>
+        <p>Cet email a été envoyé automatiquement, merci de ne pas y répondre.</p>
+    </div>
+</body>
+</html>

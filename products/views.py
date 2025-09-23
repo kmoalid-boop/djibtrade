@@ -1,9 +1,19 @@
 from rest_framework import viewsets, permissions
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from rest_framework.response import Response
 from .models import Product, Category
 from .serializers import ProductSerializer, CategorySerializer
+
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def user_products(request):
+    """Récupère toutes les annonces de l'utilisateur connecté"""
+    user_products = Product.objects.filter(owner=request.user).order_by('-created_at')
+    serializer = ProductSerializer(user_products, many=True)
+    return Response(serializer.data)
 
 
 class ProductViewSet(viewsets.ModelViewSet):

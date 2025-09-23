@@ -1,4 +1,5 @@
 import os
+import re
 from pathlib import Path
 from dotenv import load_dotenv
 from datetime import timedelta
@@ -9,7 +10,22 @@ load_dotenv(BASE_DIR / '.env')  # Charge les variables d'environnement
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = os.getenv('DEBUG') == 'True'
-ALLOWED_HOSTS = ['*'] if DEBUG else ['djibtrade.com']
+
+# ==================== HÔTES AUTORISÉS ====================
+# Autorise tous les sous-domaines Ngrok en développement
+if DEBUG:
+    ALLOWED_HOSTS = [
+        'localhost',
+        '127.0.0.1',
+        '.ngrok-free.app',
+        '.ngrok.io',
+        # Ajoutez vos IPs locales si nécessaire
+        '192.168.5.1',
+        '192.168.231.1',
+        '10.147.106.224',
+    ]
+else:
+    ALLOWED_HOSTS = ['djibtrade.com']
 
 # ==================== APPLICATIONS ====================
 INSTALLED_APPS = [
@@ -26,6 +42,7 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig',
     'products.apps.ProductsConfig',
     'subscriptions.apps.SubscriptionsConfig',
+    'notifications.apps.NotificationsConfig',
 ]
 
 # ==================== MIDDLEWARE ====================
@@ -89,14 +106,48 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # ==================== CORS ====================
-CORS_ALLOW_ALL_ORIGINS = DEBUG
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "https://djibtrade.com",
-]
+if DEBUG:
+    # En développement, autorisez tous les domaines Ngrok
+    CORS_ALLOW_ALL_ORIGINS = False  # Désactivé pour utiliser les regex
+    CORS_ALLOWED_ORIGIN_REGEXES = [
+        r"^http://localhost:\d+$",
+        r"^http://192\.168\.\d+\.\d+:\d+$",
+        r"^http://10\.\d+\.\d+\.\d+:\d+$",
+        r"^https://[a-z0-9-]+\.ngrok-free\.app$",
+        r"^https://[a-z0-9-]+\.ngrok\.io$",
+    ]
+    # Ajoutez aussi les origines spécifiques que vous voulez
+    CORS_ALLOWED_ORIGINS = [
+        "http://localhost:3000",
+        "http://localhost:5173",  # Port de Vite
+    ]
+    
+    # CONFIGURATION CSRF AJOUTÉE ICI
+    CSRF_TRUSTED_ORIGINS = [
+        "http://localhost:5173",
+        "https://*.ngrok-free.app",
+        "https://*.ngrok.io",
+    ]
+    
+    # Pour le débogage
+    print("=" * 50)
+    print("MODE DÉVELOPPEMENT ACTIVÉ")
+    print("Hôtes autorisés:", ALLOWED_HOSTS)
+    print("Origines CORS autorisées:", CORS_ALLOWED_ORIGINS)
+    print("Origines CSRF autorisées:", CSRF_TRUSTED_ORIGINS)
+    print("=" * 50)
+else:
+    # En production, soyez plus restrictif
+    CORS_ALLOW_ALL_ORIGINS = False
+    CORS_ALLOWED_ORIGINS = [
+        "https://djibtrade.com",
+    ]
+    CSRF_TRUSTED_ORIGINS = [
+        "https://djibtrade.com",
+    ]
 
 # ==================== REST FRAMEWORK ====================
 REST_FRAMEWORK = {
