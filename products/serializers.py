@@ -49,6 +49,14 @@ class ProductSerializer(serializers.ModelSerializer):
         """
         return getattr(obj.owner, 'full_name', str(obj.owner))
 
+    def validate_unit_price(self, value):
+        """
+        Validation personnalisée pour s'assurer que le prix est un entier valide.
+        """
+        if value < 1:
+            raise serializers.ValidationError("Le prix doit être au moins 1 DJF.")
+        return value
+
     def validate_currency(self, value):
         """
         Validation personnalisée : assure que la devise est DJF ou USD.

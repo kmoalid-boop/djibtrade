@@ -1,6 +1,6 @@
 from django.db import models
 from django.conf import settings
-
+from django.core.validators import MinValueValidator
 
 class Category(models.Model):
     """
@@ -45,7 +45,10 @@ class Product(models.Model):
     description = models.TextField(blank=True, null=True, help_text="Description du produit")
 
     # --- Prix et devise ---
-    unit_price = models.DecimalField(max_digits=10, decimal_places=2, help_text="Prix unitaire")
+    unit_price = models.PositiveIntegerField(  # ← CHANGEMENT ICI : Decimal → PositiveInteger
+        validators=[MinValueValidator(1)],  # Prix minimum 1 DJF
+        help_text="Prix unitaire en Francs Djiboutiens"
+    )
     currency = models.CharField(
         max_length=3,
         choices=CURRENCY_CHOICES,
@@ -53,10 +56,9 @@ class Product(models.Model):
         help_text="Devise du prix"
     )
     stock = models.PositiveIntegerField(default=1, help_text="Quantité disponible")
-    total_price = models.DecimalField(
-        max_digits=12,
-        decimal_places=2,
+    total_price = models.PositiveIntegerField(  # ← CHANGEMENT ICI : Decimal → PositiveInteger
         blank=True,
+        null=True,
         help_text="Prix total calculé automatiquement"
     )
 
@@ -96,12 +98,14 @@ class Product(models.Model):
 
     def save(self, *args, **kwargs):
         """
-        - Calcule automatiquement le prix total = unit_price × quantity.
+        - Calcule automatiquement le prix total = unit_price × stock.
         - Génère automatiquement le lien WhatsApp si l'utilisateur a un numéro de téléphone.
         """
-        # Calcul automatique du prix total
+        # Calcul automatique du prix total (maintenant en entier)
         if self.unit_price and self.stock:
             self.total_price = self.unit_price * self.stock
+        else:
+            self.total_price = None
 
         # Génération automatique du lien WhatsApp
         if self.owner and hasattr(self.owner, 'phone') and self.owner.phone:
