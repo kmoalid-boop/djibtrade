@@ -44,14 +44,17 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # ==================== CORS POUR VERCEL + RENDER ====================
 CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
-    "https://djibtrade.vercel.app",
+    "https://djibtrade.netlify.app",
     "http://localhost:3000",
     "http://localhost:5173",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://djibtrade.vercel.app",
+      "https://djibtrade.netlify.app",
+      "https://djibtrade.onrender.com",
 ]
+
+CORS_ALLOW_CREDENTIALS = True
 
 # ==================== SÉCURITÉ RENFORCÉE ====================
 SECURE_HSTS_SECONDS = 31536000
