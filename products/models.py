@@ -76,8 +76,7 @@ class Product(models.Model):
     # --- Médias ---
     image = CloudinaryField(
         'image',
-        folder='djibtrade/products',
-        default='djibtrade/products/default_product.jpg',
+        
         help_text="Image du produit"
     )
 
