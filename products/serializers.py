@@ -17,6 +17,7 @@ class ProductSerializer(serializers.ModelSerializer):
     """
     owner_name = serializers.SerializerMethodField(read_only=True)  # Nom du propriétaire
     category_name = serializers.CharField(source='category.name', read_only=True)  # Nom de la catégorie
+    image_url = serializers.SerializerMethodField()  # ← NOUVEAU : URL complète Cloudinary
 
     class Meta:
         model = Product
@@ -33,6 +34,7 @@ class ProductSerializer(serializers.ModelSerializer):
             'category_name',
             'city',
             'image',
+            'image_url',  # ← NOUVEAU : URL complète Cloudinary
             'contact_method',
             'whatsapp_contact',
             'phone_contact',
@@ -48,6 +50,14 @@ class ProductSerializer(serializers.ModelSerializer):
         sinon son identifiant.
         """
         return getattr(obj.owner, 'full_name', str(obj.owner))
+
+    def get_image_url(self, obj):
+        """
+        NOUVEAU : Retourne l'URL complète Cloudinary pour l'image
+        """
+        if obj.image:
+            return obj.image.url  # CloudinaryField.url retourne l'URL complète
+        return None
 
     def validate_unit_price(self, value):
         """
