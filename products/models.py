@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.core.validators import MinValueValidator
+from cloudinary.models import CloudinaryField
 
 class Category(models.Model):
     """
@@ -73,9 +74,10 @@ class Product(models.Model):
     city = models.CharField(max_length=100, blank=True, null=True, help_text="Ville de disponibilité")
 
     # --- Médias ---
-    image = models.ImageField(
-        upload_to='products/', 
-        default='products/default_product.jpg',
+    image = CloudinaryField(
+        'image',
+        folder='djibtrade/products',
+        default='djibtrade/products/default_product.jpg',
         help_text="Image du produit"
     )
 
