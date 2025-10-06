@@ -15,7 +15,8 @@ if RENDER_EXTERNAL_HOSTNAME:
         RENDER_EXTERNAL_HOSTNAME,
         'djibtrade.com', 
         'www.djibtrade.com',
-        'djibtrade-backend.onrender.com'
+        'djibtrade-backend.onrender.com',
+        'djibtrade.onrender.com'
     ]
 else:
     ALLOWED_HOSTS = ['localhost', '127.0.0.1']
@@ -45,13 +46,17 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
     "https://djibtrade.netlify.app",
+    "https://djibtrade.com",           # ← NOUVEAU DOMAINE
+    "https://www.djibtrade.com",       # ← NOUVEAU DOMAINE
     "http://localhost:3000",
     "http://localhost:5173",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-      "https://djibtrade.netlify.app",
-      "https://djibtrade.onrender.com",
+    "https://djibtrade.netlify.app",
+    "https://djibtrade.onrender.com",
+    "https://djibtrade.com",           # ← NOUVEAU DOMAINE
+    "https://www.djibtrade.com",       # ← NOUVEAU DOMAINE
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -63,7 +68,6 @@ SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SECURE_HSTS_PRELOAD = True
-
 
 # ==================== CLOUDINARY CONFIGURATION ====================
 INSTALLED_APPS += [
