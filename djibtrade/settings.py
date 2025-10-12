@@ -43,6 +43,9 @@ INSTALLED_APPS = [
     'products.apps.ProductsConfig',
     'subscriptions.apps.SubscriptionsConfig',
     'notifications.apps.NotificationsConfig',
+    # Cloudinary apps
+    'cloudinary_storage',
+    'cloudinary',
 ]
 
 # ==================== MIDDLEWARE ====================
@@ -108,6 +111,17 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+# ==================== CLOUDINARY CONFIGURATION DÉVELOPPEMENT ====================
+# Configuration Cloudinary pour le développement
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME', 'default_cloud_name'),
+    'API_KEY': os.getenv('CLOUDINARY_API_KEY', 'default_api_key'),
+    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET', 'default_api_secret'),
+}
+
+# Utiliser Cloudinary pour le stockage des médias
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
 # ==================== CORS ====================
 if DEBUG:
     # En développement, autorisez tous les domaines Ngrok
@@ -132,12 +146,23 @@ if DEBUG:
         "https://*.ngrok.io",
     ]
     
+    # Vérification de la configuration Cloudinary
+    cloudinary_configured = all([
+        os.getenv('CLOUDINARY_CLOUD_NAME'),
+        os.getenv('CLOUDINARY_API_KEY'), 
+        os.getenv('CLOUDINARY_API_SECRET')
+    ])
+    
     # Pour le débogage
     print("=" * 50)
     print("MODE DÉVELOPPEMENT ACTIVÉ")
     print("Hôtes autorisés:", ALLOWED_HOSTS)
     print("Origines CORS autorisées:", CORS_ALLOWED_ORIGINS)
     print("Origines CSRF autorisées:", CSRF_TRUSTED_ORIGINS)
+    if cloudinary_configured:
+        print(" Cloudinary configuré pour le stockage des médias")
+    else:
+        print("  Cloudinary non configuré - vérifie ton fichier .env")
     print("=" * 50)
 else:
     # En production, soyez plus restrictif
