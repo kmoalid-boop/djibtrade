@@ -10,21 +10,31 @@ from .models import User
 # Configuration du logger
 logger = logging.getLogger(__name__)
 
-# 🔹 Signal : Token de réinitialisation de mot de passe (VERSION PROFESSIONNELLE)
+# 🔥 NOUVEAU : Fonction pour obtenir l'URL du frontend dynamiquement
+def get_frontend_url():
+    """Retourne l'URL du frontend selon l'environnement"""
+    if settings.DEBUG:
+        return "http://localhost:5173"  # Développement
+    else:
+        # En production, utilise FRONTEND_URL ou l'URL par défaut
+        return getattr(settings, 'FRONTEND_URL', 'https://djibtrade.netlify.app')
+
+# 🔹 Signal : Token de réinitialisation de mot de passe (VERSION CORRIGÉE)
 @receiver(reset_password_token_created)
 def password_reset_token_created(sender, instance, reset_password_token, *args, **kwargs):
     """
     Envoie un email HTML professionnel avec un lien cliquable pour la réinitialisation.
     """
     try:
-        # Construire l'URL complète avec le token
-        reset_url = f"http://localhost:5173/reset-password?token={reset_password_token.key}"
+        # 🔥 CORRECTION : URL dynamique
+        frontend_url = get_frontend_url()
+        reset_url = f"{frontend_url}/reset-password?token={reset_password_token.key}"
         
         # Context pour le template
         context = {
             'reset_url': reset_url,
             'user': reset_password_token.user,
-            'token': reset_password_token.key  # Garder le token au cas où
+            'token': reset_password_token.key
         }
         
         # Rendre le template HTML
@@ -63,12 +73,12 @@ def password_reset_token_created(sender, instance, reset_password_token, *args, 
         # Envoyer l'email
         msg.send()
         
-        logger.info(f"📩 Email de réinitialisation avec lien cliquable envoyé à {reset_password_token.user.email}")
+        logger.info(f"📩 Email de réinitialisation envoyé à {reset_password_token.user.email}")
         
     except Exception as e:
         logger.error(f"❌ Erreur lors de l'envoi de l'email de reset : {e}")
 
-# 🔹 Signal : Envoi d'email de bienvenue après inscription
+# 🔹 Signal : Envoi d'email de bienvenue après inscription (VERSION CORRIGÉE)
 @receiver(post_save, sender=User)
 def send_welcome_email(sender, instance, created, **kwargs):
     """
@@ -78,11 +88,14 @@ def send_welcome_email(sender, instance, created, **kwargs):
         logger.info(f"🎉 Nouvel utilisateur créé : {instance.email} ({instance.role})")
 
         try:
+            # 🔥 CORRECTION : URL dynamique
+            frontend_url = get_frontend_url()
+            
             # Context pour le template de bienvenue
             context = {
                 'user': instance,
                 'company_name': instance.company_name,
-                'login_url': 'http://localhost:5173/login'
+                'login_url': f"{frontend_url}/login"
             }
             
             # Rendre le template HTML
@@ -95,7 +108,7 @@ def send_welcome_email(sender, instance, created, **kwargs):
             Bienvenue sur Djibtrade ! Nous sommes ravis de vous compter parmi nous.
             
             Vous pouvez maintenant vous connecter et publier vos annonces :
-            http://localhost:5173/login
+            {frontend_url}/login
             
             À très bientôt,
             L'équipe Djibtrade
@@ -113,7 +126,7 @@ def send_welcome_email(sender, instance, created, **kwargs):
             # Envoyer l'email
             msg.send()
             
-            logger.info(f"📩 Email de bienvenue HTML envoyé à {instance.email}")
+            logger.info(f"📩 Email de bienvenue envoyé à {instance.email}")
             
         except Exception as e:
             logger.error(f"❌ Erreur lors de l'envoi de l'email de bienvenue : {e}")
