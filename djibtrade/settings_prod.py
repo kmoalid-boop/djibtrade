@@ -46,8 +46,8 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
     "https://djibtrade.netlify.app",
-    "https://djibtrade.com",           # ← NOUVEAU DOMAINE
-    "https://www.djibtrade.com",       # ← NOUVEAU DOMAINE
+    "https://djibtrade.com",
+    "https://www.djibtrade.com",
     "http://localhost:3000",
     "http://localhost:5173",
 ]
@@ -55,8 +55,8 @@ CORS_ALLOWED_ORIGINS = [
 CSRF_TRUSTED_ORIGINS = [
     "https://djibtrade.netlify.app",
     "https://djibtrade.onrender.com",
-    "https://djibtrade.com",           # ← NOUVEAU DOMAINE
-    "https://www.djibtrade.com",       # ← NOUVEAU DOMAINE
+    "https://djibtrade.com",
+    "https://www.djibtrade.com",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -70,10 +70,7 @@ CSRF_COOKIE_SECURE = True
 SECURE_HSTS_PRELOAD = True
 
 # ==================== CLOUDINARY CONFIGURATION ====================
-INSTALLED_APPS += [
-    'cloudinary',
-    'cloudinary_storage',
-]
+# ⚠️ LES LIGNES CLOUDINARY ONT ÉTÉ SUPPRIMÉES CAR ELLES SONT DÉJÀ DANS settings.py
 
 # Configuration Cloudinary
 CLOUDINARY_STORAGE = {
@@ -85,8 +82,8 @@ CLOUDINARY_STORAGE = {
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # Désactiver le stockage local des médias en production
-MEDIA_URL = '/media/'  # Garder pour la compatibilité
-MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles')  # Sera ignoré grâce à Cloudinary
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles')
 
 # ==================== EMAIL PRODUCTION ====================
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
