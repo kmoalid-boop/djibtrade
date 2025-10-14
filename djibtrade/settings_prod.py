@@ -16,10 +16,11 @@ if RENDER_EXTERNAL_HOSTNAME:
         'djibtrade.com', 
         'www.djibtrade.com',
         'djibtrade-backend.onrender.com',
-        'djibtrade.onrender.com'
+        'djibtrade.onrender.com',
+        'api.djibtrade.com',  # 🔥 AJOUT ICI - Pour que Django accepte ton domaine API
     ]
 else:
-    ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'api.djibtrade.com']  # 🔥 AJOUT ICI AUSSI
 
 # ==================== MIDDLEWARE PRODUCTION ====================
 # Insérer WhiteNoise après SecurityMiddleware
@@ -48,6 +49,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://djibtrade.netlify.app",
     "https://djibtrade.com",
     "https://www.djibtrade.com",
+    "https://api.djibtrade.com",  # 🔥 AJOUT ICI - Pour autoriser les requêtes depuis ton API
     "http://localhost:3000",
     "http://localhost:5173",
 ]
@@ -57,6 +59,7 @@ CSRF_TRUSTED_ORIGINS = [
     "https://djibtrade.onrender.com",
     "https://djibtrade.com",
     "https://www.djibtrade.com",
+    "https://api.djibtrade.com",  # 🔥 AJOUT ICI - Pour la sécurité des formulaires
 ]
 
 CORS_ALLOW_CREDENTIALS = True
